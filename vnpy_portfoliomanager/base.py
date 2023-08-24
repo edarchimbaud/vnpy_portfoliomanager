@@ -15,7 +15,7 @@ class ContractResult:
         engine: "PortfolioEngine",
         reference: str,
         vt_symbol: str,
-        open_pos: int = 0
+        open_pos: int = 0,
     ) -> None:
         """"""
         super().__init__()
@@ -93,7 +93,7 @@ class ContractResult:
         self.total_pnl = self.holding_pnl + self.trading_pnl
 
     def get_data(self) -> dict:
-        """获取数据字典"""
+        """Get the data dictionary."""
         data: dict = {
             "reference": self.reference,
             "vt_symbol": self.vt_symbol,
@@ -105,7 +105,7 @@ class ContractResult:
             "long_volume": self.long_volume,
             "short_volume": self.short_volume,
             "long_cost": self.long_cost,
-            "short_cost": self.short_cost
+            "short_cost": self.short_cost,
         }
         return data
 
@@ -129,7 +129,7 @@ class PortfolioResult:
         self.total_pnl = 0
 
     def get_data(self) -> dict:
-        """获取数据字典"""
+        """Get the data dictionary."""
         data: dict = {
             "reference": self.reference,
             "trading_pnl": self.trading_pnl,

@@ -42,8 +42,7 @@ class PortfolioManagerApp(BaseApp):
     app_name: str = APP_NAME
     app_module: str = __module__
     app_path: Path = Path(__file__).parent
-    display_name: str = "投资组合"
+    display_name: str = "Portfolio"
     engine_class: Type[PortfolioEngine] = PortfolioEngine
     widget_name: str = "PortfolioManager"
     icon_name: str = str(app_path.joinpath("ui", "portfolio.ico"))
-

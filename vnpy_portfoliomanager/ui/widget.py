@@ -4,12 +4,7 @@ from vnpy.event.engine import Event
 from vnpy.trader.ui import QtWidgets, QtCore, QtGui
 
 from vnpy.trader.engine import MainEngine, EventEngine
-from vnpy.trader.ui.widget import (
-    BaseCell,
-    EnumCell,
-    DirectionCell,
-    TimeCell
-)
+from vnpy.trader.ui.widget import BaseCell, EnumCell, DirectionCell, TimeCell
 
 from ..base import ContractResult, PortfolioResult
 from ..engine import (
@@ -17,7 +12,7 @@ from ..engine import (
     EVENT_PM_CONTRACT,
     EVENT_PM_PORTFOLIO,
     EVENT_PM_TRADE,
-    PortfolioEngine
+    PortfolioEngine,
 )
 
 
@@ -51,18 +46,18 @@ class PortfolioManager(QtWidgets.QWidget):
 
     def init_ui(self) -> None:
         """"""
-        self.setWindowTitle("投资组合")
+        self.setWindowTitle("Portfolio")
 
         labels: List[str] = [
-            "组合名称",
-            "本地代码",
-            "开盘仓位",
-            "当前仓位",
-            "交易盈亏",
-            "持仓盈亏",
-            "总盈亏",
-            "多头成交",
-            "空头成交"
+            "Portfolio name",
+            "VT symbol",
+            "Open position",
+            "Current position",
+            "Trading P&L",
+            "Position P&L",
+            "Total P&L",
+            "Long",
+            "Short",
         ]
         self.column_count: int = len(labels)
 
@@ -77,19 +72,19 @@ class PortfolioManager(QtWidgets.QWidget):
 
         self.monitor: PortfolioTradeMonitor = PortfolioTradeMonitor()
 
-        expand_button: QtWidgets.QPushButton = QtWidgets.QPushButton("全部展开")
+        expand_button: QtWidgets.QPushButton = QtWidgets.QPushButton("Expand")
         expand_button.clicked.connect(self.tree.expandAll)
 
-        collapse_button: QtWidgets.QPushButton = QtWidgets.QPushButton("全部折叠")
+        collapse_button: QtWidgets.QPushButton = QtWidgets.QPushButton("Collapse")
         collapse_button.clicked.connect(self.tree.collapseAll)
 
-        resize_button: QtWidgets.QPushButton = QtWidgets.QPushButton("调整列宽")
+        resize_button: QtWidgets.QPushButton = QtWidgets.QPushButton("Resize")
         resize_button.clicked.connect(self.resize_columns)
 
         interval_spin: QtWidgets.QSpinBox = QtWidgets.QSpinBox()
         interval_spin.setMinimum(1)
         interval_spin.setMaximum(60)
-        interval_spin.setSuffix("秒")
+        interval_spin.setSuffix("Seconds")
         interval_spin.setValue(self.portfolio_engine.get_timer_interval())
         interval_spin.valueChanged.connect(self.portfolio_engine.set_timer_interval)
 
@@ -103,10 +98,10 @@ class PortfolioManager(QtWidgets.QWidget):
         hbox1.addWidget(collapse_button)
         hbox1.addWidget(resize_button)
         hbox1.addStretch()
-        hbox1.addWidget(QtWidgets.QLabel("刷新频率"))
+        hbox1.addWidget(QtWidgets.QLabel("Interval"))
         hbox1.addWidget(interval_spin)
         hbox1.addStretch()
-        hbox1.addWidget(QtWidgets.QLabel("组合成交"))
+        hbox1.addWidget(QtWidgets.QLabel("Portfolio trade"))
         hbox1.addWidget(self.reference_combo)
 
         hbox2: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
@@ -132,13 +127,15 @@ class PortfolioManager(QtWidgets.QWidget):
         """"""
         trades: List[TradeData] = self.main_engine.get_all_trades()
         for trade in trades:
-            # 过滤掉没有用reference的成交
+            # Filter out deals that don't use reference
             if hasattr(trade, "reference"):
                 self.monitor.update_trade(trade)
 
     def get_portfolio_item(self, reference: str) -> QtWidgets.QTreeWidgetItem:
         """"""
-        portfolio_item: Optional[QtWidgets.QTreeWidgetItem] = self.portfolio_items.get(reference, None)
+        portfolio_item: Optional[QtWidgets.QTreeWidgetItem] = self.portfolio_items.get(
+            reference, None
+        )
 
         if not portfolio_item:
             portfolio_item: QtWidgets.QTreeWidgetItem = QtWidgets.QTreeWidgetItem()
@@ -153,7 +150,9 @@ class PortfolioManager(QtWidgets.QWidget):
 
         return portfolio_item
 
-    def get_contract_item(self, reference: str, vt_symbol: str) -> QtWidgets.QTreeWidgetItem:
+    def get_contract_item(
+        self, reference: str, vt_symbol: str
+    ) -> QtWidgets.QTreeWidgetItem:
         """"""
         key: Tuple[str, str] = (reference, vt_symbol)
         contract_item: Optional[str] = self.contract_items.get(key, None)
@@ -166,7 +165,9 @@ class PortfolioManager(QtWidgets.QWidget):
 
             self.contract_items[key] = contract_item
 
-            portfolio_item: QtWidgets.QTreeWidgetItem = self.get_portfolio_item(reference)
+            portfolio_item: QtWidgets.QTreeWidgetItem = self.get_portfolio_item(
+                reference
+            )
             portfolio_item.addChild(contract_item)
 
         return contract_item
@@ -176,8 +177,7 @@ class PortfolioManager(QtWidgets.QWidget):
         contract_result: dict = event.data
 
         contract_item: QtWidgets.QTreeWidgetItem = self.get_contract_item(
-            contract_result["reference"],
-            contract_result["vt_symbol"]
+            contract_result["reference"], contract_result["vt_symbol"]
         )
         contract_item.setText(2, str(contract_result["open_pos"]))
         contract_item.setText(3, str(contract_result["last_pos"]))
@@ -193,7 +193,9 @@ class PortfolioManager(QtWidgets.QWidget):
         """"""
         portfolio_result: dict = event.data
 
-        portfolio_item: QtWidgets.QTreeWidgetItem = self.get_portfolio_item(portfolio_result["reference"])
+        portfolio_item: QtWidgets.QTreeWidgetItem = self.get_portfolio_item(
+            portfolio_result["reference"]
+        )
         portfolio_item.setText(4, str(portfolio_result["trading_pnl"]))
         portfolio_item.setText(5, str(portfolio_result["holding_pnl"]))
         portfolio_item.setText(6, str(portfolio_result["total_pnl"]))
@@ -205,17 +207,11 @@ class PortfolioManager(QtWidgets.QWidget):
         trade: TradeData = event.data
         self.monitor.update_trade(trade)
 
-    def update_item_color(
-        self,
-        item: QtWidgets.QTreeWidgetItem,
-        result: dict
-    ) -> None:
+    def update_item_color(self, item: QtWidgets.QTreeWidgetItem, result: dict) -> None:
         start_column: int = 4
-        for n, pnl in enumerate([
-            result["trading_pnl"],
-            result["holding_pnl"],
-            result["total_pnl"]
-        ]):
+        for n, pnl in enumerate(
+            [result["trading_pnl"], result["holding_pnl"], result["total_pnl"]]
+        ):
             i: int = n + start_column
 
             if pnl > 0:
@@ -253,17 +249,17 @@ class PortfolioTradeMonitor(QtWidgets.QTableWidget):
     def init_ui(self) -> None:
         """"""
         labels: List[str] = [
-            "组合",
-            "成交号",
-            "委托号",
-            "代码",
-            "交易所",
-            "方向",
-            "开平",
-            "价格",
-            "数量",
-            "时间",
-            "接口",
+            "Portfolio",
+            "Trade number",
+            "Order number",
+            "Symbol",
+            "Exchange",
+            "Direction",
+            "Offset",
+            "Price",
+            "Volume",
+            "Time",
+            "Gateway",
         ]
         self.setColumnCount(len(labels))
         self.setHorizontalHeaderLabels(labels)
@@ -320,9 +316,7 @@ class TreeDelegate(QtWidgets.QStyledItemDelegate):
     """"""
 
     def sizeHint(
-        self,
-        option: QtWidgets.QStyleOptionViewItem,
-        index: QtCore.QModelIndex
+        self, option: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex
     ) -> QtCore.QSize:
         """"""
         size: QtCore.QSize = super().sizeHint(option, index)

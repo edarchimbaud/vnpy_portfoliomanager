@@ -1,4 +1,4 @@
-# VeighNa框架的交易组合管理模块
+# Trading Portfolio Management Module for VeighNa Framework
 
 <p align="center">
   <img src ="https://vnpy.oss-cn-shanghai.aliyuncs.com/vnpy-logo.png"/>
@@ -11,23 +11,23 @@
     <img src ="https://img.shields.io/github/license/vnpy/vnpy.svg?color=orange"/>
 </p>
 
-## 说明
+## Description
 
-PortfolioManager是用于交易组合跟踪管理的功能模块，以独立的策略交易组合（子账户）为基础，提供委托成交记录管理、交易仓位自动跟踪以及每日盈亏实时统计功能。
+PortfolioManager is a functional module for trading portfolio tracking and management, based on independent strategy trading portfolio (sub-accounts), providing commission transaction record management, automatic tracking of trading positions and real-time daily profit and loss statistics.
 
-## 安装
+## Installation
 
-安装环境推荐基于3.0.0版本以上的【[**VeighNa Studio**](https://www.vnpy.com)】。
+The installation environment is recommended to be based on version 3.0.0 or above of [[**VeighNa Studio**](https://edarchimbaud.com/veighna-website)].
 
-直接使用pip命令：
+Use pip command directly:
 
-```
+```bash
 pip install vnpy_portfoliomanager
 ```
 
 
-或者下载源代码后，解压后在cmd中运行：
+Or download the source code, unzip it and run it in cmd:
 
-```
+```bash
 pip install .
 ```

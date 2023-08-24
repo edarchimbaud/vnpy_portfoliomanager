@@ -1,7 +1,7 @@
-# 1.0.2版本
+# Version 1.0.2
 
-1. 调整推送事件的数据结构为字典
+1. Adjust the data structure of push events to a dictionary
 
-# 1.0.1版本
+# Version 1.0.1
 
-1. 将模块的图标文件信息，改为完整路径字符串
+1. Change the module's icon file information to a full path string.
