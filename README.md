@@ -17,7 +17,7 @@ PortfolioManager is a functional module for trading portfolio tracking and manag
 
 ## Installation
 
-The installation environment is recommended to be based on version 3.0.0 or above of [[**VeighNa Studio**](https://edarchimbaud.com/veighna-website)].
+The installation environment is recommended to be based on version 3.0.0 or above of [[**VeighNa Studio**](https://github.com/paperswithbacktest/vnpy)].
 
 Use pip command directly:
 
